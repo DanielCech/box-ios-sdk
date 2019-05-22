@@ -22,6 +22,7 @@
 @property (nonatomic, readwrite, strong) BOXContentClient *client;
 @property (nonatomic, readwrite, strong) BOXRequest *request;
 @property (nonatomic, readwrite, strong) BOXRequest *nonBackgroundUploadRequest;
+@property (nonatomic, readwrite, strong) BOXFileVersionRequest *testingRequest;
 
 @end
 
@@ -38,6 +39,20 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    //////////////////////
+    // TODO: temporary code for feature testing
+    
+    NSString *fileID = @"446610690540";
+    NSString *versionID = @"488534271011";
+    
+    self.testingRequest = [self.client fileVersionRequestForFileWithID:fileID versionID:versionID];
+    
+    [self.testingRequest performRequestWithCompletion:^(BOXFileVersion *fileVersion, NSError *error) {
+        NSLog(@"fileVersion: %@", fileVersion);
+    }];
+    
+    //////////////////////
     
     self.tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
     self.refreshControl = [[UIRefreshControl alloc] init];
@@ -306,7 +321,7 @@
     // We did not find a file named similarly, we can upload normally the file.
     NSString *tempPath = nil;
     NSString *associateId = nil;
-    NSString *userId = self.client.user.modelID;
+    NSString *userId = self.client.user.uniqueId;
     if (background == YES) {
         NSString *tempFileName = [BOXSampleAppSessionManager generateRandomStringWithLength:32];
         tempPath = [[[BOXSampleAppSessionManager defaultManager] boxURLRequestCacheDir] stringByAppendingPathComponent:tempFileName];
